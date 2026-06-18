@@ -1,0 +1,205 @@
+Files for user management
+=========================
+/etc/passwd              # Stores basic user information (username, UID, GID, home dir, shell)
+
+/etc/shadow              # Stores encrypted passwords & password aging info
+
+/etc/group               # Stores group information (group name, GID, members)
+
+/etc/gshadow             # Stores secure group info (encrypted group passwords, admins)
+
+/etc/login.defs          # Defines default user settings (UID range, password policy)  #max days, min days, warn days
+
+/etc/default/useradd     # Stores default values for user creation (shell, home dir)
+
+/etc/skel                # Template directory for new users (default files copied to home directory of each new user)
+
+/etc/sudoers             # Controls sudo access (who can run commands as root)
+
+/home/username   # User home directory (personal files, configs)
+
+/var/spool/mail/username   # Stores local mail for user
+
+/etc/security/pwquality.conf   # Defines password complexity rules (length, characters, retry limits)
+
+/etc/nologin                  # Prevents non-root users from logging into the system
+
+~/.bashrc                     # User-specific shell config (aliases, environment variables, functions)
+
+/etc/bashrc                   # System-wide bash configuration for all users
+
+~/.bash_profile              # Executes on user login (sets environment, calls .bashrc)
+
+/etc/profile                 # System-wide login configuration (applies to all users)
+
+/etc/profile.d/              # Directory containing additional system-wide scripts
+
+~/.bash_logout               # Executes commands when user logs out
+
+~/.bash_history              # Stores history of executed commands for the user
+
+==========================================================================================
+Methods to Give Sudo Access
+1. Add user in /etc/sudoers file
+   # username ALL=(ALL) ALL
+   # username ALL=(ALL) NOPASSWD: ALL
+   # username ALL=(ALL) /usr/bin/systemctl restart httpd
+
+2. Add user to wheel group
+   # usermod -aG wheel username
+   
+3. Add a file /etc/sudoers.d/username
+   # username ALL=(ALL) ALL
+===========================================================================================
+UMASK Values (Root vs Normal User)
+Root user default UMASK       # 022
+Non-root (regular user)      # 002 or 022 (depends on distro)
+
+Difference:
+Root user (022)
+Files → 644
+Directories → 755
+✅ More secure (others get read-only)
+
+Normal user (often 002 in some systems)
+Files → 664
+Directories → 775
+✅ Group collaboration allowed
+
+Where UMASK is Set
+/etc/profile
+/etc/bashrc
+/etc/login.defs
+~/.bashrc
+
+=========================================================================================
+
+useradd username                             # Creates a user (no home directory by default)
+
+useradd -m username                          # Creates user with home directory
+
+useradd -d /opt/devuser username             # Sets custom home directory
+
+useradd -m -d /opt/devuser username          # Creates user with custom home directory
+
+useradd -c "DevOps Engineer" username        # Adds comment/description for user
+
+useradd -u 2001 username                     # Assigns specific UID
+
+useradd -g devops username                   # Sets primary group
+
+useradd -G devops,admin username             # Adds user to secondary groups
+
+useradd -s /bin/bash username                # Sets login shell
+
+===========================================================================================
+
+usermod -u 2001 username          # Changes UID of user
+
+usermod -g group username         # Changes primary group
+
+usermod -aG group username        # Adds user to supplementary group (append)
+
+usermod -d /home/new username     # Changes home directory
+
+usermod -l newname oldname        # Renames user
+
+usermod -s /bin/bash username     # Changes login shell
+
+===========================================================================================
+
+passwd username                   # Sets/changes user password
+
+passwd -l username                # Locks user account
+
+passwd -u username                # Unlocks user account
+
+passwd -e username                # Forces password change at next login
+
+=============================================================================================
+
+chage -M 90 username              # Sets max password validity days
+
+chage -m 1 username               # Sets minimum days before change
+
+chage -W 7 username               # Sets password expiry warning days
+
+chage -l username                 # Shows password aging info
+
+==============================================================================================
+
+groupadd devops                   # Creates a new group
+
+groupadd -g 2001 devops           # Creates group with specific GID
+
+groupmod -n newname oldname       # Renames group
+
+groupmod -g 3001 groupname        # Changes GID of group
+
+gpasswd -a username group         # Adds user to group
+
+gpasswd -d username group         # Removes user from group
+
+gpasswd group                     # Sets group password
+
+gpasswd -A user group             # Assigns group administrator
+
+groupdel groupname                # Deletes a group
+
+sudo command                      # Run command as root
+
+sudo -u username command          # Run command as specific user
+
+ulimit -a                        # Shows all resource limits for current user
+
+ulimit -n 1024                   # Sets max number of open files
+
+ulimit -u 100                    # Sets max number of user processes
+
+date                             # Displays current system date & time
+
+date "+%Y-%m-%d %H:%M:%S"        # Shows formatted date
+
+date -s "2026-06-18 10:00:00"    # Sets system date & time (root only)
+
+env                              # Displays all environment variables
+
+env | grep PATH                  # Shows specific environment variable
+
+env VAR=value command            # Runs command with temporary variable
+
+source file.sh                   # Executes script in current shell (no new shell)
+
+source ~/.bashrc                 # Reloads bash configuration
+
+who                               # Shows currently logged-in users
+
+last                              # Shows login history of users
+
+uptime                           # Shows system running time, load average, logged-in users
+
+====================================================================================================
+
+🐧 /etc/security/limits.conf
+
+/etc/security/limits.conf is used to define resource limits for users and groups, such as number of open files, processes, and memory usage, 
+helping to prevent system overload in multi-user environments.It controls how much system resources a user or service can consume, which is 
+critical in production servers to ensure stability and avoid performance issues.
+
+The configuration follows the format:         domain, type, item, value, where
+
+domain   specifies the target (user, group using @group, or * for all users),
+type     defines whether the limit is soft (temporary, adjustable by user) or hard (maximum enforced limit),
+item     represents the resource (like nofile for open files, nproc for processes, cpu, memlock, etc.),value is the numeric limit.
+
+Soft limits can be increased by users up to the hard limit, while hard limits cannot be exceeded and act as a strict ceiling,
+which is an important interview concept.
+
+Common real-world configurations include setting high nofile limits for web servers or databases to handle large numbers of 
+concurrent connections, and limiting nproc to prevent fork bombs or excessive process creation.
+These limits are enforced through PAM (Pluggable Authentication Modules), so for the configuration to work properly, 
+the pam_limits.so module must be enabled in files like /etc/pam.d/system-auth or /etc/pam.d/common-session.
+Changes made in this file apply only after the user logs out and logs back in, and in many production scenarios, 
+services managed by systemd may override these limits, requiring configuration at the service level instead.
+A commonly asked interview scenario is when limits are not applied, in which case you should check PAM configuration, 
+user session reload, and systemd overrides.
