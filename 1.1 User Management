@@ -203,3 +203,28 @@ Changes made in this file apply only after the user logs out and logs back in, a
 services managed by systemd may override these limits, requiring configuration at the service level instead.
 A commonly asked interview scenario is when limits are not applied, in which case you should check PAM configuration, 
 user session reload, and systemd overrides.
+
+=======================================================================================================
+chage -l username (List Fields Explained)
+
+Last password change                                    : Jun 18, 2026
+Password expires                                        : Sep 16, 2026
+Password inactive                                       : never
+Account expires                                         : never
+Minimum number of days between password change          : 0
+Maximum number of days between password change          : 90
+Number of days of warning before password expires       : 7
+
+chage -M 90 username        # Sets maximum password validity (expiry)
+
+chage -m 1 username         # Sets minimum days before password can be changed
+
+chage -W 7 username         # Sets warning days before expiry
+
+chage -I 10 username        # Set inactivity days after expiry (account lock)
+
+chage -E 2026-12-31 username  # Set account expiration date
+
+chage -d 0 username         # Force password change at next login
+
+chage -l username           # Display password aging info
