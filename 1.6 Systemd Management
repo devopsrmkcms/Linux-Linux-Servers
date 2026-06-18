@@ -1,1 +1,182 @@
+✅ 1. What is systemd
+systemd = init system + service manager in Linux
+PID 1 process → controls boot process and services
+Main responsibilities:
 
+Service management
+Boot process
+Logging (journald)
+Device & socket management
+Target-based grouping (like runlevels)
+
+
+✅ 2. Unit Types (important for interview)
+.service → service
+.socket → socket activation
+.target → grouping of units
+.mount → mount points
+.timer → scheduled jobs (cron alternative)
+.path → trigger based on file changes
+.swap → swap partitions
+.device → hardware devices
+
+✅ 3. Basic systemctl Commands (MOST IMPORTANT)
+Start a service
+systemctl start nginx
+Stop a service
+systemctl stop nginx
+Restart
+systemctl restart nginx
+Reload (no stop/start)
+systemctl reload nginx
+Enable (start at boot)
+systemctl enable nginx
+Disable
+systemctl disable nginx
+Check status
+systemctl status nginx
+Check if active
+systemctl is-active nginx
+Check if enabled
+systemctl is-enabled nginx
+
+✅ 4. Listing & Info Commands
+List all services
+systemctl list-units --type=service
+List all active
+systemctl list-units
+List all (including inactive)
+systemctl list-units --all
+List failed services
+systemctl --failed
+Show unit details
+systemctl show nginx
+
+✅ 5. Targets (Runlevels Replacement)
+Old → New
+Runlevel 0 → poweroff.target
+Runlevel 1 → rescue.target
+Runlevel 3 → multi-user.target
+Runlevel 5 → graphical.target
+Runlevel 6 → reboot.target
+Check default target
+systemctl get-default
+Set default target
+systemctl set-default multi-user.target
+Switch target immediately
+systemctl isolate multi-user.target
+
+✅ 6. Enable/Disable Boot Behavior
+Enable service at boot
+systemctl enable httpd
+Disable
+systemctl disable httpd
+Mask service (completely block it)
+systemctl mask httpd
+Unmask
+systemctl unmask httpd
+
+✅ 7. Service Unit File Location
+System services
+/usr/lib/systemd/system/
+Custom services (recommended)
+/etc/systemd/system/
+Runtime services
+/run/systemd/system/
+
+✅ 8. Service File Structure (VERY IMPORTANT)
+Example breakdown:
+[Unit]
+Description=My App
+After=network.target
+[Service]
+Type=simple
+ExecStart=/usr/bin/python app.py
+Restart=always
+[Install]
+WantedBy=multi-user.target
+
+✅ Meaning of Each Field
+[Unit] section
+Description → service description
+After → dependency (start after this)
+Requires → hard dependency
+[Service] section
+ExecStart → main command
+ExecStop → stop command
+Restart → auto restart
+Type → simple | forking | oneshot
+[Install] section
+WantedBy → which target wants this service
+
+✅ 9. Important Daemon Commands
+Reload systemd config (after editing file)
+systemctl daemon-reload
+Re-exec systemd
+systemctl daemon-reexec
+
+✅ 10. Logs (journalctl)
+View all logs
+journalctl
+Service logs
+journalctl -u nginx
+Live logs
+journalctl -f
+Boot logs
+journalctl -b
+Previous boot
+journalctl -b -1
+
+✅ 11. Troubleshooting (DevOps Practical)
+Check failed services
+systemctl --failed
+Check logs
+journalctl -xe
+Detailed service logs
+journalctl -u service_name
+Restart and check
+systemctl restart service_name
+
+✅ 12. Dependency Management
+See dependencies
+systemctl list-dependencies nginx
+Reverse dependencies
+systemctl list-dependencies --reverse nginx
+
+✅ 13. Timer (Cron Alternative)
+List timers
+systemctl list-timers
+Start timer
+systemctl start backup.timer
+
+✅ 14. System Power Commands
+Shutdown
+systemctl poweroff
+Reboot
+systemctl reboot
+Suspend
+systemctl suspend
+
+✅ 15. Common DevOps Scenarios
+Service not starting:
+systemctl status nginx
+journalctl -u nginx
+Service auto restart:
+Restart=always in service file
+Run script as service:
+Create .service file → add ExecStart → enable
+
+✅ 16. Quick Interview One-Liners
+systemctl = control systemd services
+daemon-reload = reload unit files
+target = group of services (runlevel replacement)
+journalctl = logging system
+
+✅ 17. Most Important Commands (Revision)
+systemctl start nginx
+systemctl stop nginx
+systemctl restart nginx
+systemctl enable nginx
+systemctl status nginx
+systemctl daemon-reload
+journalctl -u nginx
