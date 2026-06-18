@@ -1,1 +1,65 @@
+HARD LINK and SOFT LINK
 
+✅ Hard Link
+A hard link is another name (entry) for the same physical file in the filesystem. It directly points to the same inode, 
+meaning both the original file and the hard link share the exact same data. If one file is deleted, the data is still 
+accessible through the other link because the inode remains until all links are removed. Hard links cannot be created 
+across different filesystems and are generally not allowed for directories.
+
+Key Points:
+
+Points to the same inode (same file data)
+Data survives even if the original file is deleted
+Cannot cross filesystems
+Cannot link directories (except special cases)
+No difference between original file and hard link
+
+
+✅ Soft Link (Symbolic Link)
+A soft link (symbolic link) is a special file that acts as a pointer to the path of another file. It does not store 
+actual data but references the original file location. If the original file is deleted or moved, the soft link becomes 
+broken because it depends on the file path. Soft links are flexible as they can span across filesystems and can also link directories.
+Key Points:
+
+Points to file path (acts like shortcut)
+Breaks if original file is deleted or moved
+Can cross filesystems
+Can link directories
+Has its own inode (different from original file)
+
+==============================================================================================================
+
+
+
+Process Table (Main Section)
+
+PID → Process ID
+USER → Owner of process
+PR → Priority
+NI → Nice value (priority adjustment)
+VIRT → Virtual memory used
+RES → Physical RAM used
+SHR → Shared memory
+S → Process state (R, S, Z, etc.)
+%CPU → CPU usage
+%MEM → Memory usage
+TIME+ → Total CPU time consumed
+COMMAND → Process name
+================================================
+
+Process States (Very Important) RSDTZI
+
+R → Running
+S → Sleeping
+D → Uninterruptible (mostly I/O wait)
+T → Stopped
+Z → Zombie
+I → Idle
+===============================================
+
+High load avg + high CPU → CPU bottleneck
+High wa (wait) → disk issue
+High memory + swap used → memory pressure
+Zombie processes → parent not cleaning child
+
+==============================================
