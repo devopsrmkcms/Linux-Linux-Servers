@@ -180,3 +180,131 @@ systemctl enable nginx
 systemctl status nginx
 systemctl daemon-reload
 journalctl -u nginx
+
+============================================
+✅ 1. Change Target at Runtime (Temporary)
+👉 This change is ONLY for current session (no reboot persistence)
+Use:
+systemctl isolate multi-user.target
+OR
+systemctl isolate graphical.target
+
+✅ What happens
+
+Immediately switches system state
+Stops services not part of target
+Starts required services for target
+
+
+✅ Example
+Switch GUI → CLI:
+systemctl isolate multi-user.target
+Switch CLI → GUI:
+systemctl isolate graphical.target
+
+✅ Interview one-liner
+isolate = runtime target switch (temporary, immediate)
+
+✅ 2. Change Target Permanently (Default Boot Target)
+👉 This change applies after reboot
+Use:
+systemctl set-default multi-user.target
+OR
+systemctl set-default graphical.target
+
+✅ Example
+Set CLI mode permanently:
+systemctl set-default multi-user.target
+Set GUI permanently:
+systemctl set-default graphical.target
+
+✅ Check current default
+systemctl get-default
+
+✅ What it does internally
+Creates symlink:
+/etc/systemd/system/default.target → chosen target
+
+✅ 3. Combined Usage (Real Scenario)
+👉 You want immediate + permanent change:
+Step 1 (runtime):
+systemctl isolate multi-user.target
+Step 2 (permanent):
+systemctl set-default multi-user.target
+
+✅ 4. Targets Quick Reference
+multi-user.target → CLI mode (no GUI)
+graphical.target → GUI mode
+rescue.target → single-user (troubleshooting)
+emergency.target → minimal shell
+
+✅ 5. Troubleshooting Tip
+If GUI not working:
+systemctl isolate multi-user.target
+Fix issue →
+systemctl isolate graphical.target
+
+✅ 6. Quick Difference (Important)
+isolate:
+
+Immediate
+Temporary
+No reboot needed
+
+set-default:
+
+Permanent
+Applies after reboot
+Safe for production change
+
+===========================================================
+how to change systemd target at boot time from GRUB menu ✅ (very important for rescue/debug scenarios like yours)
+
+✅ 1. Steps from GRUB Menu
+Step 1: Reboot server
+At GRUB screen → select your kernel (don’t press Enter)
+
+Step 2: Press e
+👉 This opens GRUB edit mode
+
+Step 3: Find the kernel line
+Look for line starting with:
+linux /vmlinuz-...
+
+Step 4: Modify this line (VERY IMPORTANT)
+At the end of that line, add:
+👉 For CLI mode:
+systemd.unit=multi-user.target
+
+👉 For Rescue mode:
+systemd.unit=rescue.target
+
+👉 For Emergency mode:
+systemd.unit=emergency.target
+
+
+✅ Example full kernel line
+linux /vmlinuz-5.x.x root=/dev/sda1 ro crashkernel=1G systemd.unit=multi-user.target
+
+(You already mentioned crashkernel present — it's fine ✅)
+
+Step 5: Boot with changes
+Press:
+Ctrl + X
+OR
+F10
+
+✅ 2. What This Does
+
+Overrides default target only for that boot
+Very useful for:
+
+fixing broken GUI
+troubleshooting services
+recovering system (like your kernel panic case)
+
+✅ 3. Important Notes
+✔ This is TEMPORARY (only current boot)
+✔ Does NOT change default target permanently
+✔ Perfect for rescue/debug mode
+
